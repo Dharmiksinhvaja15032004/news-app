@@ -15,8 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('newsBox');
-  final remoteDataSource = NewsRemoteDataSource();
   final localDataSource = NewsLocalDataSource();
+  final remoteDataSource = NewsRemoteDataSource(localDataSource);
   final repository =
   NewsRepositoryImpl(remoteDataSource, localDataSource);
   final getNews = GetNews(repository);
@@ -24,7 +24,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => NewsProvider(getNews)),
+        ChangeNotifierProvider(create: (_) => NewsProvider(getNews,localDataSource)),
         ChangeNotifierProvider(create: (_) => ThemeProvider())
       ],
       child: const MyApp(),

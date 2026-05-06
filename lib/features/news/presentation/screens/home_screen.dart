@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../provider/news_provider.dart';
 import '../provider/theme_provider.dart';
 import '../widgets/drawer.dart';
-import 'LikedScreen.dart';
 import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Timer? _debounce;
   StreamSubscription? _connectionSubscription;
 
   final List<String> categories = [
@@ -27,21 +27,25 @@ class _HomeScreenState extends State<HomeScreen> {
     "arts"
   ];
 
+  // 🌍 COUNTRY LIST
+  final List<String> countries = ["in", "us", "gb", "au"];
+  String selectedCountry = "in";
+
   bool isSearching = false;
   final TextEditingController searchController = TextEditingController();
-
   @override
-
   void initState() {
     super.initState();
+
     final provider = Provider.of<NewsProvider>(context, listen: false);
+
     Future.microtask(() {
-      provider.fetchNews("home");
+      provider.country = selectedCountry;
+      provider.loadInitial();
     });
-    _connectionSubscription = Connectivity().onConnectivityChanged.listen((result) {
-          if (result != ConnectivityResult.none) {
-            provider.fetchNews(provider.category);
-          }
+    _connectionSubscription =
+        Connectivity().onConnectivityChanged.listen((result) {
+          print("Connection changed: $result");
         });
   }
   @override
@@ -57,15 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
+          _buildTopFilter(provider),
           _buildCategories(provider),
           Expanded(child: _buildNewsList(provider)),
         ],
       ),
     );
   }
+
+  // 🔥 APP BAR
   PreferredSizeWidget _buildAppBar() {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
@@ -93,16 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
             : const Text(
           "News Explorer",
           style: TextStyle(
-            fontSize: 30,
+            fontSize: 26,
             fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
             color: Colors.white,
           ),
         ),
-
         actions: [
-
-          // 🔍 SEARCH BUTTON
           IconButton(
             icon: Icon(
               isSearching ? Icons.close : Icons.search,
@@ -111,7 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               setState(() {
                 isSearching = !isSearching;
-
                 if (!isSearching) {
                   searchController.clear();
                   Provider.of<NewsProvider>(context, listen: false)
@@ -120,8 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
           ),
-
-          // 🌙 THEME BUTTON
           IconButton(
             icon: Icon(
               themeProvider.isDark
@@ -133,29 +133,46 @@ class _HomeScreenState extends State<HomeScreen> {
               themeProvider.toggleTheme();
             },
           ),
-
-          const SizedBox(width: 8),
         ],
-
-        // 🔥 BOTTOM LINE (premium touch)
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(3),
-          child: Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withOpacity(0.3),
-                  Colors.white.withOpacity(0.8),
-                  Colors.white.withOpacity(0.3),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
+
+  // 🌍 COUNTRY DROPDOWN
+  Widget _buildTopFilter(NewsProvider provider) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Row(
+        children: [
+          const Icon(Icons.public, size: 20),
+          const SizedBox(width: 8),
+          DropdownButton<String>(
+            value: selectedCountry,
+            items: countries.map((c) {
+              return DropdownMenuItem(
+                value: c,
+                child: Text(c.toUpperCase()),
+              );
+            }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCountry = value!;
+                });
+
+                // 🔥 debounce logic
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+                _debounce = Timer(const Duration(milliseconds: 800), () {
+                  provider.changeCountry(selectedCountry);
+                });
+              }
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 📂 CATEGORY CHIPS
   Widget _buildCategories(NewsProvider provider) {
     return SizedBox(
       height: 50,
@@ -171,27 +188,40 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ChoiceChip(
               label: Text(cat),
               selected: isSelected,
-              onSelected: (_) => provider.fetchNews(cat),
+                onSelected: (_) async {
+                  if (provider.category != cat) {
+                    await provider.filterByCategory(cat);
+                  }
+                }
             ),
           );
         },
       ),
     );
   }
-  Widget _buildNewsList(NewsProvider provider) {
 
+  // 📰 NEWS LIST
+  Widget _buildNewsList(NewsProvider provider) {
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+
     if (provider.articles.isEmpty) {
-      return const Center(child: Text("No articles found"));
+      return const Center(
+        child: Text("No news available 😢"),
+      );
     }
+
     return RefreshIndicator(
-      onRefresh: () => provider.fetchNews(provider.category),
+      onRefresh: () async {
+        await Future.delayed(const Duration(seconds: 1)); // 🔥 delay
+        await provider.refresh();
+      },
       child: ListView.builder(
         itemCount: provider.articles.length,
         itemBuilder: (context, index) {
           final article = provider.articles[index];
+
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -224,24 +254,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              article.author.isNotEmpty
-                                  ? article.author
-                                  : "Unknown",
-                              style: const TextStyle(fontSize: 12),
+                            Expanded(
+                              child: Text(
+                                article.author.isNotEmpty
+                                    ? article.author
+                                    : "Unknown",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            Text(
-                              article.date,
-                              style: const TextStyle(fontSize: 12),
-                            ),
+                            Text(article.date),
                           ],
                         ),
                       ],

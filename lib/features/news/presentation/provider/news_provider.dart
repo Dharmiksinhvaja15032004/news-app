@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
 import '../../domain/usecases/get_news.dart';
 import '../../domain/entities/article.dart';
+import '../../data/datasource/news_local_data_source.dart';
+import '../../data/models/article_model.dart';
 
 class NewsProvider extends ChangeNotifier {
   final GetNews getNews;
+  final NewsLocalDataSource local;
 
-  NewsProvider(this.getNews);
+  NewsProvider(this.getNews, this.local);
 
   List<Article> articles = [];
   List<Article> allArticles = [];
+
+  bool isLoading = false;
+  bool hasFetched = false;
+
+  String category = "home";
+  String country = "in";
+
+  // ❤️ LIKE SYSTEM
+  final Set<String> likedArticles = {};
+
   List<Article> get likedNews {
     return allArticles
         .where((article) => likedArticles.contains(article.id))
         .toList();
   }
 
-  bool isLoading = false;
-  String category = "home";
-
-  // ❤️ LIKE SYSTEM
-  final Set<String> likedArticles = {};
-
-  bool isLiked(String id) {
-    return likedArticles.contains(id);
-  }
+  bool isLiked(String id) => likedArticles.contains(id);
 
   void toggleLike(String id) {
     if (likedArticles.contains(id)) {
@@ -38,33 +43,99 @@ class NewsProvider extends ChangeNotifier {
   void setArticles(List<Article> newArticles) {
     allArticles = newArticles;
     articles = newArticles;
-    notifyListeners();
   }
 
-  // 🔍 SEARCH
+  // 🔍 SEARCH (NO API)
   void search(String query) {
     if (query.isEmpty) {
-      articles = allArticles;
+      articles = local.getByCategory(category);
     } else {
-      articles = allArticles.where((article) {
-        return article.title.toLowerCase().contains(query.toLowerCase()) ||
-            article.description.toLowerCase().contains(query.toLowerCase());
-      }).toList();
+      articles = local.searchNews(query);
     }
     notifyListeners();
   }
 
-  // 🌐 FETCH NEWS
-  Future<void> fetchNews(String cat) async {
-    category = cat;
+  Future<void> loadInitial() async {
+    if (hasFetched) return;
+
     isLoading = true;
     notifyListeners();
 
     try {
-      final data = await getNews(cat);
-      setArticles(data);
+      final categories = ["home", "world", "science", "sports", "arts"];
+
+      for (var cat in categories) {
+        final data = await getNews(cat, country);
+
+        final models =
+        data.map((e) => ArticleModel.fromEntity(e)).toList();
+
+        if (models.isNotEmpty) {
+          await local.cacheNews(models, cat);
+        }
+      }
+
+      final cached = local.getByCategory("home");
+      setArticles(cached);
+
+      hasFetched = true;
+    } catch (e) {
+      final cached = local.getCachedNews();
+      setArticles(cached);
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> filterByCategory(String cat) async {
+    category = cat;
+
+    isLoading = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    final list = local.getByCategory(cat);
+
+    setArticles(list);
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  // 🌍 COUNTRY CHANGE
+  void changeCountry(String newCountry) {
+    country = newCountry;
+    hasFetched = false; // allow fresh API
+    refresh();
+  }
+
+  // 🔄 REFRESH (API + CACHE UPDATE)
+  Future<void> refresh() async {
+    if (isLoading) return;
+
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final data = await getNews(category, country);
+
+      final models =
+      data.map((e) => ArticleModel.fromEntity(e)).toList();
+
+      if (models.isNotEmpty) {
+        await local.cacheNews(models, category);
+      }
+
+      final updated = local.getByCategory(category);
+      setArticles(updated);
     } catch (e) {
       print("ERROR: $e");
+
+      // fallback
+      final cached = local.getByCategory(category);
+      setArticles(cached);
     }
 
     isLoading = false;

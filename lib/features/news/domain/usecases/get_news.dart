@@ -6,7 +6,7 @@ class GetNews {
 
   GetNews(this.repository);
 
-  Future<List<Article>> call(String category) {
-    return repository.getNews(category);
+  Future<List<Article>> call(String category, String country) {
+    return repository.getNews(category, country: country);
   }
 }

@@ -7,26 +7,27 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class NewsRepositoryImpl implements NewsRepository {
   final NewsRemoteDataSource remoteDataSource;
   final NewsLocalDataSource localDataSource;
-  NewsRepositoryImpl(this.remoteDataSource,this.localDataSource,);
+
+  NewsRepositoryImpl(this.remoteDataSource, this.localDataSource);
 
   @override
-
-  @override
-  Future<List<Article>> getNews(String category) async {
-
+  Future<List<Article>> getNews(String category, {String? country}) async {
     final connectivityResult = await Connectivity().checkConnectivity();
 
-    // ✅ INTERNET AVAILABLE → ONLY API
+    // ✅ INTERNET AVAILABLE → API
     if (connectivityResult != ConnectivityResult.none) {
-      final remoteNews = await remoteDataSource.getNews(category);
+      final remoteNews = await remoteDataSource.getNews(
+        category: category,
+        country: country, // 🔥 ADD THIS
+      );
 
       // 🔥 SAVE TO HIVE
-      await localDataSource.cacheNews(remoteNews);
+      await localDataSource.cacheNews(remoteNews, category);
 
       return remoteNews;
     }
 
-    // ❌ NO INTERNET → ONLY LOCAL
+    // ❌ NO INTERNET → LOCAL
     return localDataSource.getCachedNews();
   }
 }
