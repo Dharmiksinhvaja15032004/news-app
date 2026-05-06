@@ -46,7 +46,7 @@ A modern Flutter-based News Application that fetches real-time news using API an
 
 <img width="297" height="650" alt="Screenshot 2026-05-06 at 2 11 41 AM" src="https://github.com/user-attachments/assets/d33746a0-d58c-41f2-a365-0f5a420600f5" />
 <img width="300" height="654"<img width="299" height="652" alt="Screenshot 2026-05-06 at 2 12 03 AM" src="https://github.com/user-attachments/assets/ec6f93e9-33c7-45fd-bf08-b965550bec1c" />
- alt="Screenshot 2026-05-06 at 2 11 29 AM" src="https://github.com/user-attachments/assets/7a9831cd-b996-4e0d-9f61-c2de7207b4c2" />
+<img width="297" height="650" alt="Screenshot 2026-05-06 at 2 11 29 AM" src="https://github.com/user-attachments/assets/7a9831cd-b996-4e0d-9f61-c2de7207b4c2" />
 <img width="289" height="645" alt="Screenshot 2026-05-06 at 2 11 52 AM" src="https://github.com/user-attachments/assets/108cda21-e2b1-4fa7-aa61-accbfcbbce13" />
 <img width="218" height="485" alt="Screenshot 2026-05-06 at 11 54 15 AM" src="https://github.com/user-attachments/assets/3796deb8-8ac7-440b-b117-841025f9cd7e" />
 
