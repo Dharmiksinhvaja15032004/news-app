@@ -22,8 +22,10 @@ A modern Flutter-based News Application that fetches real-time news using API an
 ## 📸 Screenshots
 
 ### 🏠 Home Screen
-<img width="295" height="657" alt="Screenshot 2026-05-06 at 2 09 54 AM" src="https://github.com/user-attachments/assets/044229b5-e85f-47c1-9cdc-78cc874aca31" />
-<img width="299" height="652" alt="Screenshot 2026-05-06 at 2 12 03 AM" src="https://github.com/user-attachments/assets/dbb8c56b-c9a5-425b-9a5f-9e6d5f133eda" />
+
+<img width="220" height="485" alt="Screenshot 2026-05-06 at 11 54 04 AM" src="https://github.com/user-attachments/assets/c9ecc17c-6b7a-43a9-85c4-ee4d13e4424a" />
+
+<img width="218" height="485" alt="Screenshot 2026-05-06 at 11 54 15 AM" src="https://github.com/user-attachments/assets/3fba2ce7-8c7d-497b-9bc6-23ba17d2fb84" />
 
 
 ### 📄 Detail Screen
@@ -46,6 +48,8 @@ A modern Flutter-based News Application that fetches real-time news using API an
 <img width="300" height="654"<img width="299" height="652" alt="Screenshot 2026-05-06 at 2 12 03 AM" src="https://github.com/user-attachments/assets/ec6f93e9-33c7-45fd-bf08-b965550bec1c" />
  alt="Screenshot 2026-05-06 at 2 11 29 AM" src="https://github.com/user-attachments/assets/7a9831cd-b996-4e0d-9f61-c2de7207b4c2" />
 <img width="289" height="645" alt="Screenshot 2026-05-06 at 2 11 52 AM" src="https://github.com/user-attachments/assets/108cda21-e2b1-4fa7-aa61-accbfcbbce13" />
+<img width="218" height="485" alt="Screenshot 2026-05-06 at 11 54 15 AM" src="https://github.com/user-attachments/assets/3796deb8-8ac7-440b-b117-841025f9cd7e" />
+
 
 
 🚀 Splash Screen
