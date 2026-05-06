@@ -13,21 +13,15 @@ class NewsRepositoryImpl implements NewsRepository {
   @override
   Future<List<Article>> getNews(String category, {String? country}) async {
     final connectivityResult = await Connectivity().checkConnectivity();
-
-    // ✅ INTERNET AVAILABLE → API
     if (connectivityResult != ConnectivityResult.none) {
       final remoteNews = await remoteDataSource.getNews(
         category: category,
-        country: country, // 🔥 ADD THIS
+        country: country,
       );
-
-      // 🔥 SAVE TO HIVE
       await localDataSource.cacheNews(remoteNews, category);
 
       return remoteNews;
     }
-
-    // ❌ NO INTERNET → LOCAL
     return localDataSource.getCachedNews();
   }
 }

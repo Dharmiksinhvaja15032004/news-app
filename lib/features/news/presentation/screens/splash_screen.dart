@@ -8,18 +8,13 @@ class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-
   late AnimationController _controller;
   late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();
-
-    // 🔥 fade animation
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -29,10 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _controller,
       curve: Curves.easeIn,
     );
-
     _controller.forward();
-
-    // 🔥 navigate after delay
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
@@ -40,13 +32,11 @@ class _SplashScreenState extends State<SplashScreen>
       );
     });
   }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,8 +57,6 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
-              // 🔥 Logo
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -81,10 +69,7 @@ class _SplashScreenState extends State<SplashScreen>
                   color: Colors.white,
                 ),
               ),
-
               const SizedBox(height: 25),
-
-              // 🔥 App Name
               const Text(
                 "News Explorer",
                 style: TextStyle(
@@ -94,10 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
                   letterSpacing: 1,
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // 🔥 Tagline
               Text(
                 "Stay updated with the world",
                 style: TextStyle(

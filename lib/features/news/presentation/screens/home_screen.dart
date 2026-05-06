@@ -14,11 +14,9 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
   Timer? _debounce;
   StreamSubscription? _connectionSubscription;
-
   final List<String> categories = [
     "home",
     "world",
@@ -26,19 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
     "sports",
     "arts"
   ];
-
-  // 🌍 COUNTRY LIST
-  final List<String> countries = ["in", "us", "gb", "au"];
-  String selectedCountry = "in";
-
+  final List<String> countries = ["India", "United States", "United Kingdom", "Australia"];
+  String selectedCountry = "India";
   bool isSearching = false;
   final TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-
     final provider = Provider.of<NewsProvider>(context, listen: false);
-
     Future.microtask(() {
       provider.country = selectedCountry;
       provider.loadInitial();
@@ -54,11 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
     searchController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<NewsProvider>(context);
-
     return Scaffold(
       appBar: _buildAppBar(),
       drawer: const AppDrawer(),
@@ -71,8 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // 🔥 APP BAR
   PreferredSizeWidget _buildAppBar() {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
@@ -137,8 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // 🌍 COUNTRY DROPDOWN
   Widget _buildTopFilter(NewsProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -158,8 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   selectedCountry = value!;
                 });
-
-                // 🔥 debounce logic
                 if (_debounce?.isActive ?? false) _debounce!.cancel();
 
                 _debounce = Timer(const Duration(milliseconds: 800), () {
@@ -199,8 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // 📰 NEWS LIST
   Widget _buildNewsList(NewsProvider provider) {
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -214,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1)); // 🔥 delay
+        await Future.delayed(const Duration(seconds: 1));
         await provider.refresh();
       },
       child: ListView.builder(

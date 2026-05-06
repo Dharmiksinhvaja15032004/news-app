@@ -28,7 +28,6 @@ class DetailScreen extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         elevation: 0,
         centerTitle: true,
-
         title: Text(
           "News Detail",
           style: TextStyle(
@@ -91,7 +90,6 @@ class DetailScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-
               SizedBox(
                 height: 280,
                 width: double.infinity,
@@ -105,7 +103,6 @@ class DetailScreen extends StatelessWidget {
                   child: const Icon(Icons.image_not_supported),
                 ),
               ),
-
               Container(
                 height: 280,
                 decoration: BoxDecoration(

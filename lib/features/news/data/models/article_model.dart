@@ -9,27 +9,20 @@ class ArticleModel extends Article {
     required super.date,
     required super.url,
   });
-
-  // 📰 NYTIMES API
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
       title: json['title'] ?? '',
       author: json['byline'] ?? '',
       description: json['abstract'] ?? '',
-
-      // 🔥 SAFE IMAGE FIX
       image: (json['multimedia'] != null &&
           json['multimedia'] is List &&
           json['multimedia'].isNotEmpty)
           ? json['multimedia'][0]['url'] ?? ''
           : '',
-
       date: json['published_date'] ?? '',
       url: json['url'] ?? '',
     );
   }
-
-  // 🌍 NEWS API (COUNTRY FILTER SUPPORT)
   factory ArticleModel.fromNewsApi(Map<String, dynamic> json) {
     return ArticleModel(
       title: json['title'] ?? '',

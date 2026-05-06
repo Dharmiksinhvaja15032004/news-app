@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
 
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
 
-      // 🌞 LIGHT THEME
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
@@ -59,7 +58,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // 🌙 DARK THEME
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF121212),
